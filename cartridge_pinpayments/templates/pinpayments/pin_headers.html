@@ -1,0 +1,99 @@
+<!-- Based on https://pin.net.au/docs/guides/payment-forms
+and modified from django_pinpayments pin_headers.html
+
+NOTE: This requires the template checkout.html modifications in this
+app, which add the following:
+
+id='checkout-form' on the form element
+name='next' on the 'Next' submit button.
+
+If you override the checkout.html template, make sure your template also
+contains these changes.
+-->
+
+<script src='https://cdn.pin.net.au/pin.v2.js' type='text/javascript'></script>
+<script type='text/javascript'>
+    $(function() {
+        console.log("page loaded");
+        var pinApi = new Pin.Api('{{ pin_public_key }}', '{{ pin_environment }}');
+
+        var form = $('form.checkout-form');
+        console.log("form is");
+        console.log(form);
+
+        var submitButton = form.find(":submit[name='next']");
+        console.log("submitButton is");
+        console.log(submitButton);
+
+        form.submit(function(e) {
+            console.log("in submit, e is");
+            console.log(e);
+            e.preventDefault();
+
+            // Disable the submit button to prevent multiple clicks
+            submitButton.attr({disabled: true});
+
+            // Fetch details required for the createToken call to Pin
+            var card = {
+                number: $('#id_card_number').val(),
+                name: $('#id_card_name').val(),
+                expiry_month: $('#id_card_expiry_month').val(),
+                expiry_year: $('#id_card_expiry_year').val(),
+                cvc: $('#id_card_ccv').val(),
+                address_line1: $('#id_billing_detail_street').val(),
+                address_line2: '',
+                address_city: $('#id_billing_detail_city').val(),
+                address_state: $('#id_billing_detail_state').val(),
+                address_postcode: $('#id_billing_detail_postcode').val(),
+                address_country: $('#id_billing_detail_country').val()
+            };
+            console.log("submitting card with number " + card.number);
+            console.log(card);
+
+            // Request a token for the card from Pin
+            pinApi.createCardToken(card).then(handleSuccess, handleError).done();
+        });
+
+        function handleSuccess(card) {
+            // Add the card token to the form
+            console.log("handleSuccess");
+            console.log(card);
+
+            // Set the card token and ip address value
+            // in the form
+            $("#id_card_token").val(card.token);
+
+            // Resubmit the form
+            form.get(0).submit();
+        };
+
+        function handleError(response) {
+            console.log("handleError");
+            console.log(response);
+            // Pass errors to django???
+            // FIXME
+            var errtext = response.error_description;
+            if (response.messages) {
+                $.each(response.messages, function(index, errorMessage) {
+                    errtext = errtext.concat(errorMessage.message);
+                });
+            }
+
+            alert(errtext);
+
+            // errorHeading.text(response.error_description);
+
+            //  if (response.messages) {
+            //    $.each(response.messages, function(index, paramError) {
+            //      $('<li>')
+            //        .text(paramError.param + ": " + paramError.message)
+            //        .appendTo(errorList);
+            //    });
+            //  }
+
+            //  errorContainer.show();
+
+            submitButton.removeAttr('disabled');
+        };
+    });
+</script>
