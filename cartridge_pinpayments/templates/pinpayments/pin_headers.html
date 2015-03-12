@@ -14,26 +14,31 @@ contains these changes.
 <script src='https://cdn.pin.net.au/pin.v2.js' type='text/javascript'></script>
 <script type='text/javascript'>
     $(function() {
-        console.log("page loaded");
         var pinApi = new Pin.Api('{{ pin_public_key }}', '{{ pin_environment }}');
 
-        var form = $('form.checkout-form');
-        console.log("form is");
-        console.log(form);
+        var form = $('form.checkout-form'), 
+            nextButton = form.find(":submit[name='next']"),
+            backButton = form.find(":submit[name='back']");
 
-        var submitButton = form.find(":submit[name='next']");
-        console.log("submitButton is");
-        console.log(submitButton);
+        backButton.click(function(e) {
+            // Clicking the 'back' button is always OK.
+            // Clear previous errors
+            $("#id_pinjs_errors").val("");
+            // continue with form submission
+            return true;
+        })
 
-        form.submit(function(e) {
-            console.log("in submit, e is");
-            console.log(e);
+        nextButton.click(function(e) {
+            // 'Next' button was clicked.
             e.preventDefault();
 
-            // Disable the submit button to prevent multiple clicks
-            submitButton.attr({disabled: true});
+            // Clear previous errors
+            $("#id_pinjs_errors").val("");
 
-            // Fetch details required for the createToken call to Pin
+            // Disable the submit button to prevent multiple clicks
+            nextButton.attr({disabled: true});
+
+            // Fetch details required for the createToken call to Pin Payments
             var card = {
                 number: $('#id_card_number').val(),
                 name: $('#id_card_name').val(),
@@ -47,53 +52,35 @@ contains these changes.
                 address_postcode: $('#id_billing_detail_postcode').val(),
                 address_country: $('#id_billing_detail_country').val()
             };
-            console.log("submitting card with number " + card.number);
-            console.log(card);
 
-            // Request a token for the card from Pin
+            // Request a token for the card from Pin Payments
             pinApi.createCardToken(card).then(handleSuccess, handleError).done();
         });
 
         function handleSuccess(card) {
-            // Add the card token to the form
-            console.log("handleSuccess");
-            console.log(card);
-
-            // Set the card token and ip address value
-            // in the form
+            // Set the card token in the form
             $("#id_card_token").val(card.token);
+            $("#id_pinjs_errors").val("");
 
-            // Resubmit the form
+            // Resubmit the form to the server
+            // The card_number and card_ccv will not be submitted to the server,
+            // as the form inputs have no 'name' attribute.
+            // Instead the card_token is submitted to the server.
             form.get(0).submit();
         };
 
         function handleError(response) {
-            console.log("handleError");
-            console.log(response);
-            // Pass errors to django???
-            // FIXME
-            var errtext = response.error_description;
-            if (response.messages) {
-                $.each(response.messages, function(index, errorMessage) {
-                    errtext = errtext.concat(errorMessage.message);
-                });
-            }
+            // Store the error messages in the pinjs_errors hidden form field
+            // These become form validation errors in PinOrderForm.clean()
+            // See forms.py
+            var errmsgs = JSON.stringify(response.messages);
+            $("#id_pinjs_errors").val(errmsgs);
 
-            alert(errtext);
+            // Re-enable the next button
+            nextButton.removeAttr('disabled');
 
-            // errorHeading.text(response.error_description);
-
-            //  if (response.messages) {
-            //    $.each(response.messages, function(index, paramError) {
-            //      $('<li>')
-            //        .text(paramError.param + ": " + paramError.message)
-            //        .appendTo(errorList);
-            //    });
-            //  }
-
-            //  errorContainer.show();
-
-            submitButton.removeAttr('disabled');
+            // Resubmit the form to the server, errors should result.
+            form.get(0).submit();
         };
     });
 </script>

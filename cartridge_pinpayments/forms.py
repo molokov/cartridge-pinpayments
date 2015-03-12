@@ -44,14 +44,19 @@ class PinOrderForm(shop_forms.OrderForm):
     processes these fields (and others) to create a token, which is then
     stored in the hidden form element.
     - Card token form elements are set by the Javascript.
+    - Errors from Pin.js are set by the Javascript, and will be handled
+      as django errors.
 
     See https://pin.net.au/docs/guides/payment-forms
     """
     card_token = forms.CharField(label=_("Card Token"), required=False)
+    pinjs_errors = forms.CharField(label=_("Pin.js Errors"), required=False)
 
     def __init__(self, request, step, data=None, initial=None, errors=None):
         super(PinOrderForm, self).__init__(request, step, data, initial, errors)
         self.fields["card_token"].widget = forms.HiddenInput()
+        self.fields["pinjs_errors"].widget = forms.HiddenInput()
+        self.fields["pinjs_errors"].value = ""
 
         # The card number and CCV fields should have the 'name' attribute removed
         # and the fields made non-required, as they will be handled by the javascript
@@ -66,9 +71,39 @@ class PinOrderForm(shop_forms.OrderForm):
             self.fields["card_ccv"].required = False
     
     def clean(self):
-        print "~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
-        # FIXME: Debugging only
-        for k, v in self.cleaned_data.items():
-            print "{0} = {1}".format(k, v)
+        """
+        See if pin.js returned any errors
+        """
+        import json
+        pinjs_errors = self.cleaned_data["pinjs_errors"]
+        if pinjs_errors:
+            errors = json.loads(pinjs_errors)
+            for e in errors:
+                try:
+                    param = e['param']
+                    msg = e['message']
+                except (KeyError, TypeError):
+                    continue
+
+                # Formatting here is done so that errors from Pin Payments API
+                # are converted to more Django-like errors for "blank" fields,
+                # or given directly otherwise.
+                # The errors are also associated with the appropriate form field
+                if param == "cvc":
+                    self._errors["card_ccv"] = self.error_class([_("This field is required.")])
+                elif param == "number":
+                    if "can't be blank" in msg:
+                        self._errors["card_number"] = self.error_class([_("This field is required.")])
+                    else:
+                        self._errors["card_number"] = self.error_class([msg])
+                elif param == "name":
+                    if "can't be blank" in msg:
+                        self._errors["card_name"] = self.error_class([_("This field is required.")])
+                    else:
+                        self._errors["card_name"] = self.error_class([msg])
+                else:
+                    raise forms.ValidationError(msg)
 
         return super(PinOrderForm, self).clean()
+
+

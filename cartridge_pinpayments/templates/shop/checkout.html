@@ -29,7 +29,8 @@ $(function() {$('.middle :input:visible:enabled:first').focus();});
 
 {% block before-form %}{% endblock %}
 <div class="row">
-<form method="post" class="checkout-form col-md-8" id="checkout-form"> {# DS #}
+{# id added to the form #}
+<form method="post" class="checkout-form col-md-8" id="checkout-form">
     {% csrf_token %}
 
     {% block fields %}{% endblock %}
@@ -37,6 +38,7 @@ $(function() {$('.middle :input:visible:enabled:first').focus();});
     {% block nav-buttons %}
         {% if request.cart.has_items %}
             <div class="form-actions">
+                {# name added to the next button #}
                 <input type="submit" class="btn btn-lg btn-primary pull-right" name="next" value="{% trans "Next" %}">
                 {% if not CHECKOUT_STEP_FIRST %}
                 <input type="submit" class="btn btn-lg btn-default pull-left" name="back" value="{% trans "Back" %}">
