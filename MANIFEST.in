@@ -1,2 +1,2 @@
-include LICENSE README.rd
+include LICENSE README.md
 recursive-include cartridge_pinpayments *
