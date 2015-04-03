@@ -54,7 +54,7 @@ In your urls.py, ensure the PinOrderForm class is used in place of OrderForm:
 
 ## Migrate Existing Database
 
-Required by django-pinpayments.
+Required by django-pinpayments. Ensure south is installed first!
 
 	python manage.py migrate pinpayments
 
@@ -67,9 +67,11 @@ Required by django-pinpayments.
 
 These are:
 
-	<form method="post" class="checkout-form col-md-8" **id="checkout-form"** >
+<pre>
+	&lt;form method="post" class="checkout-form col-md-8" <b>id="checkout-form"</b> &gt;
 	
-	<input type="submit" class="btn btn-lg btn-primary pull-right" **name="next"** value="{% trans "Next" %}">
+	&lt;input type="submit" class="btn btn-lg btn-primary pull-right" <b>name="next"</b> value="{% trans "Next" %}"&gt;
+</pre>
 
 Thus if you are planning to override checkout.html yourself, be sure to copy these modifications across to your version of the template.
 

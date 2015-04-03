@@ -49,6 +49,7 @@ setup(
 
     keywords='django mezzanine cartridge payment',
     packages=find_packages(exclude=['contrib', 'docs', 'tests*']),
+    include_package_data=True,
 
     install_requires=['mezzanine', 'cartridge', 'django-pinpayments'],
 
