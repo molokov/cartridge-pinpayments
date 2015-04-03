@@ -10,6 +10,7 @@ See http://pin.net.au for PIN Payments home page.
 * Cartridge 0.9.5 or later
 * django-pinpayments ( https://github.com/RossP/django-pinpayments/ )
 
+NOTE: This has only been tested against Django 1.6.10, which is what Mezzanine 3.1.10 supports.
 
 ## Installation:
 Working in your project's virtual environment:
