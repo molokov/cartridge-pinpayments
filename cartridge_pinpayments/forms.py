@@ -104,6 +104,11 @@ class PinOrderForm(shop_forms.OrderForm):
                 else:
                     raise forms.ValidationError(msg)
 
+        # Cartridge expects card_number and card_ccv to be non-blank
+        # when we are using a credit card.
+        self.cleaned_data["card_number"] = "CARDNUMBER"
+        self.cleaned_data["card_ccv"] = "CCV"
+
         return super(PinOrderForm, self).clean()
 
 
