@@ -6,16 +6,15 @@ See http://pin.net.au for PIN Payments home page.
 
 ## Requirements:
 
-* Mezzanine 3.1.10 or later
-* Cartridge 0.9.5 or later
+* Mezzanine 4.0.1 or later
+* Cartridge 0.10.0 or later
 * django-pinpayments ( https://github.com/RossP/django-pinpayments/ )
-
-NOTE: This has only been tested against Django 1.6.10, which is what Mezzanine 3.1.10 supports.
+* Django 1.7 or later
 
 ## Installation:
 Working in your project's virtual environment:
 
-	pip install git+https://github.com/molokov/cartridge-pinpayments.git
+	pip install -e git+https://github.com/molokov/cartridge-pinpayments.git#egg=cartridge_pinpayments
 
 Add the following settings to your settings file:
 
@@ -55,8 +54,10 @@ In your urls.py, ensure the PinOrderForm class is used in place of OrderForm:
 
 ## Migrate Existing Database
 
-Required by django-pinpayments. Ensure south is installed first!
+Required by django-pinpayments. Note that as of 2 Aug 2015, rossp's django-pinpayments is
+not updated for Django 1.7/1.8 so you will need to run makemigrations to create the migrations file suitable for this django version.
 
+    python manage.py makemigrations pinpayments
 	python manage.py migrate pinpayments
 
 
@@ -64,7 +65,7 @@ Required by django-pinpayments. Ensure south is installed first!
 
 **IMPORTANT**
 
-*templates/shop/checkout.html* has been overridden from the version in cartridge 0.9.5 to define some extra ids and names on form elements that are used by the javascript in the included pin_header.html template. 
+*templates/shop/checkout.html* has been overridden from the version in cartridge 0.10.0 to define some extra ids and names on form elements that are used by the javascript in the included pin_header.html template. 
 
 These are:
 

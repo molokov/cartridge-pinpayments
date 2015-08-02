@@ -1,8 +1,8 @@
 import locale
-from pinpayments.models import PinTransaction
-
 
 def payment_handler(request, order_form, order):
+    from pinpayments.models import PinTransaction
+    
     amount = order.total
     order_id = str(order.id)
     data = order_form.cleaned_data
