@@ -1,7 +1,7 @@
 from django import forms
 from django.utils.translation import ugettext_lazy as _
 from django.utils.html import format_html
-from django.forms.util import flatatt
+from django.forms.utils import flatatt
 
 import cartridge.shop.forms as shop_forms
 
