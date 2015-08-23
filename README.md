@@ -54,8 +54,22 @@ In your urls.py, ensure the PinOrderForm class is used in place of OrderForm:
 
 ## Migrate Existing Database
 
-Required by django-pinpayments. Note that as of 2 Aug 2015, rossp's django-pinpayments is
-not updated for Django 1.7/1.8 so you will need to run makemigrations to create the migrations file suitable for this django version.
+The django-pinpayments app needs to create two tables in the database - Note that as of 23 Aug 2015, rossp's django-pinpayments has not been updated for Django 1.7/1.8 and thus does not contain migrations.
+
+If creating your project from scratch, you may be able to get away with just:
+
+    python manage.py createdb
+
+Note that the pinpayments tables may be then created as follows:
+
+    Synchronizing apps without migrations:
+      Creating tables...
+        Creating table pinpayments_customertoken
+        Creating table pinpayments_pintransaction
+        Running deferred SQL...
+      Installing custom SQL...
+
+However, if you are migrating an existing database, you may need to run makemigrations to create the migrations file suitable for this django version.
 
     python manage.py makemigrations pinpayments
 	python manage.py migrate pinpayments

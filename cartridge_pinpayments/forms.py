@@ -4,7 +4,7 @@ from django.utils.html import format_html
 from django.forms.utils import flatatt
 
 import cartridge.shop.forms as shop_forms
-
+from cartridge.shop import checkout
 
 class NoNameTextInput(forms.TextInput):
 
@@ -73,6 +73,7 @@ class PinOrderForm(shop_forms.OrderForm):
     def clean(self):
         """
         See if pin.js returned any errors
+        See if the card_token was created successfully.
         """
         import json
         pinjs_errors = self.cleaned_data["pinjs_errors"]
@@ -103,6 +104,12 @@ class PinOrderForm(shop_forms.OrderForm):
                         self._errors["card_name"] = self.error_class([msg])
                 else:
                     raise forms.ValidationError(msg)
+        elif self.cleaned_data["step"] >= checkout.CHECKOUT_STEP_PAYMENT and not self.cleaned_data["card_token"]:
+            # Card token is blank, but pinjs_errors is also blank - this may occur
+            # if e.g. javascript is disabled or JS from pin.net.au was not loaded
+            # Although we have warnings in place (see pin_headers.html and payment.html)
+            # We should catch this here rather than later.
+            raise forms.ValidationError("Credit Card number/CCV could not be processed. Please try again.")
 
         # Cartridge expects card_number and card_ccv to be non-blank
         # when we are using a credit card.

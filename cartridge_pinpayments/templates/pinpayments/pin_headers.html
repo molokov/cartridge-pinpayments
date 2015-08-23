@@ -11,10 +11,19 @@ If you override the checkout.html template, make sure your template also
 contains these changes.
 -->
 
-<script src='https://cdn.pin.net.au/pin.v2.js' type='text/javascript'></script>
-<script type='text/javascript'>
+<script src="https://cdn.pin.net.au/pin.v2.js" type="text/javascript"></script>
+<script type="text/javascript">
     $(function() {
-        var pinApi = new Pin.Api('{{ pin_public_key }}', '{{ pin_environment }}');
+        try {
+            pinApi = new Pin.Api('{{ pin_public_key }}', '{{ pin_environment }}');
+            // Success, so we can hide the "no_javascript" warning from the payment.html template
+            $("#no_javascript").hide();
+        }
+        catch (err) {
+            // The pin.js script was not loaded successfully, so we want to
+            // display an error to the user.
+            console.error("PIN API could not be created.");
+        }
 
         var form = $('form.checkout-form'), 
             nextButton = form.find(":submit[name='next']"),

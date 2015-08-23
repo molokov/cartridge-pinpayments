@@ -6,6 +6,10 @@
 {% pin_header %}
 {% endblock %}
 
+{% block before-form %}
+<div id="no_javascript" class="alert alert-danger">Warning: JavaScript processing for this site has not been fully enabled. Errors may occur.</div>
+{% endblock %}
+
 {% block fields %}
 {% if request.cart.has_items %}
 {% errors_for form %}
