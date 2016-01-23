@@ -35,21 +35,21 @@ Add the following settings to your settings file:
 
 In your urls.py, ensure the PinOrderForm class is used in place of OrderForm:
 
+	from cartridge.shop.views import checkout_steps
 	from cartridge_pinpayments.forms import PinOrderForm
 
 	# ...
 
-	urlpatterns += patterns('',
+	urlpatterns += [
 
     	# Use our special OrderForm class
-    	url("^shop/checkout/$", "cartridge.shop.views.checkout_steps", 
-        	name="shop_checkout", kwargs=dict(form_class=PinOrderForm)),
+    	url("^shop/checkout/$", checkout_steps, name="shop_checkout", kwargs=dict(form_class=PinOrderForm)),
 
     	# Cartridge URLs.
-    	("^shop/", include("cartridge.shop.urls")),
+    	url("^shop/", include("cartridge.shop.urls")),
 
     	# ...
-    )
+    ]
 
 
 ## Migrate Existing Database
