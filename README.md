@@ -6,10 +6,10 @@ See http://pin.net.au for PIN Payments home page.
 
 ## Requirements:
 
-* Mezzanine 4.0.1 or later
-* Cartridge 0.10.0 or later
-* django-pinpayments ( https://github.com/RossP/django-pinpayments/ )
-* Django 1.7 or later
+* Mezzanine 4.2.0 or later
+* Cartridge 0.12.0 or later
+* django-pinpayments 1.0.11 or later ( https://github.com/RossP/django-pinpayments/ )
+* Django 1.10 or later
 
 ## Installation:
 Working in your project's virtual environment:
@@ -29,7 +29,7 @@ Add the following settings to your settings file:
 
 	SHOP_HANDLER_PAYMENT = "cartridge_pinpayments.payment_handler"
 
-	# set these variables up as per django-pinpayments instructions 
+	# set these variables up as per django-pinpayments instructions
 	PIN_ENVIRONMENTS = { ... }
 	PIN_DEFAULT_ENVIRONMENT = 'test'
 
@@ -54,24 +54,8 @@ In your urls.py, ensure the PinOrderForm class is used in place of OrderForm:
 
 ## Migrate Existing Database
 
-The django-pinpayments app needs to create two tables in the database - Note that as of 23 Aug 2015, rossp's django-pinpayments has not been updated for Django 1.7/1.8 and thus does not contain migrations.
+The django-pinpayments app needs to create two tables in the database, so be sure to run:
 
-If creating your project from scratch, you may be able to get away with just:
-
-    python manage.py createdb
-
-Note that the pinpayments tables may be then created as follows:
-
-    Synchronizing apps without migrations:
-      Creating tables...
-        Creating table pinpayments_customertoken
-        Creating table pinpayments_pintransaction
-        Running deferred SQL...
-      Installing custom SQL...
-
-However, if you are migrating an existing database, you may need to run makemigrations to create the migrations file suitable for this django version.
-
-    python manage.py makemigrations pinpayments
 	python manage.py migrate pinpayments
 
 
@@ -79,13 +63,13 @@ However, if you are migrating an existing database, you may need to run makemigr
 
 **IMPORTANT**
 
-*templates/shop/checkout.html* has been overridden from the version in cartridge 0.10.0 to define some extra ids and names on form elements that are used by the javascript in the included pin_header.html template. 
+*templates/shop/checkout.html* has been overridden from the version in cartridge 0.12.0 to define some extra ids and names on form elements that are used by the javascript in the included pin_header.html template.
 
 These are:
 
 <pre>
 	&lt;form method="post" class="checkout-form col-md-8" <b>id="checkout-form"</b> &gt;
-	
+
 	&lt;input type="submit" class="btn btn-lg btn-primary pull-right" <b>name="next"</b> value="{% trans "Next" %}"&gt;
 </pre>
 
