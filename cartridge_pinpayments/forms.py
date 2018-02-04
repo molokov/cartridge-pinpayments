@@ -6,6 +6,7 @@ from django.forms.utils import flatatt
 import cartridge.shop.forms as shop_forms
 from cartridge.shop import checkout
 
+
 class NoNameTextInput(forms.TextInput):
 
     """ A widget for a text input that omits the 'name' attribute, which
@@ -20,16 +21,17 @@ class NoNameTextInput(forms.TextInput):
         if attrs is None:
             attrs = {}
         attrs['autocomplete'] = 'off'
-        final_attrs = self.build_attrs(attrs, type=self.input_type)
+        final_attrs = self.build_attrs(attrs, {"type": self.input_type})
         # Remove the name from the attributes, as this is what this
         # widget is for!
         if 'name' in final_attrs:
             final_attrs.pop('name')
-        # Never add the value to the HTML rendering, this field 
+        # Never add the value to the HTML rendering, this field
         # will be encrypted and should remain blank if the form is
         # re-loaded!
         final_attrs['value'] = ''
         return format_html('<input{0} />', flatatt(final_attrs))
+
 
 class NoNamePasswordInput(NoNameTextInput):
     input_type = 'password'
@@ -53,14 +55,15 @@ class PinOrderForm(shop_forms.OrderForm):
     pinjs_errors = forms.CharField(label=_("Pin.js Errors"), required=False)
 
     def __init__(self, request, step, data=None, initial=None, errors=None):
-        super(PinOrderForm, self).__init__(request, step, data, initial, errors)
+        super(PinOrderForm, self).__init__(
+            request, step, data, initial, errors)
         self.fields["card_token"].widget = forms.HiddenInput()
         self.fields["pinjs_errors"].widget = forms.HiddenInput()
         self.fields["pinjs_errors"].value = ""
 
         # The card number and CCV fields should have the 'name' attribute removed
         # and the fields made non-required, as they will be handled by the javascript
-        # and remain blank when hitting the server. 
+        # and remain blank when hitting the server.
         if not isinstance(self.fields["card_number"].widget, forms.HiddenInput):
             # Card number is not hidden
             self.fields["card_number"].widget = NoNameTextInput()
@@ -69,7 +72,7 @@ class PinOrderForm(shop_forms.OrderForm):
             # Card CCV is not hidden
             self.fields["card_ccv"].widget = NoNamePasswordInput()
             self.fields["card_ccv"].required = False
-    
+
     def clean(self):
         """
         See if pin.js returned any errors
@@ -89,17 +92,21 @@ class PinOrderForm(shop_forms.OrderForm):
                 # Formatting here is done so that errors from Pin Payments API
                 # are converted to more Django-like errors for "blank" fields,
                 # or given directly otherwise.
-                # The errors are also associated with the appropriate form field
+                # The errors are also associated with the appropriate form
+                # field
                 if param == "cvc":
-                    self._errors["card_ccv"] = self.error_class([_("This field is required.")])
+                    self._errors["card_ccv"] = self.error_class(
+                        [_("This field is required.")])
                 elif param == "number":
                     if "can't be blank" in msg:
-                        self._errors["card_number"] = self.error_class([_("This field is required.")])
+                        self._errors["card_number"] = self.error_class(
+                            [_("This field is required.")])
                     else:
                         self._errors["card_number"] = self.error_class([msg])
                 elif param == "name":
                     if "can't be blank" in msg:
-                        self._errors["card_name"] = self.error_class([_("This field is required.")])
+                        self._errors["card_name"] = self.error_class(
+                            [_("This field is required.")])
                     else:
                         self._errors["card_name"] = self.error_class([msg])
                 else:
@@ -109,7 +116,8 @@ class PinOrderForm(shop_forms.OrderForm):
             # if e.g. javascript is disabled or JS from pin.net.au was not loaded
             # Although we have warnings in place (see pin_headers.html and payment.html)
             # We should catch this here rather than later.
-            raise forms.ValidationError("Credit Card number/CCV could not be processed. Please try again.")
+            raise forms.ValidationError(
+                "Credit Card number/CCV could not be processed. Please try again.")
 
         # Cartridge expects card_number and card_ccv to be non-blank
         # when we are using a credit card.
@@ -117,5 +125,3 @@ class PinOrderForm(shop_forms.OrderForm):
         self.cleaned_data["card_ccv"] = "CCV"
 
         return super(PinOrderForm, self).clean()
-
-
