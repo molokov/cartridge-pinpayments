@@ -2,14 +2,14 @@
 
 PIN payments integration for mezzanine/cartridge
 
-See http://pin.net.au for PIN Payments home page.
+See https://pinpayments.com/ for PIN Payments home page.
 
 ## Requirements:
 
-* Mezzanine 4.2.0 or later
-* Cartridge 0.12.0 or later
+* Mezzanine 5.0.0a1 or later
+* Cartridge 1.0.0a1 or later (from https://github.com/fermorltd/cartridge/tree/2.2-compat )
 * django-pinpayments 1.0.11 or later ( https://github.com/RossP/django-pinpayments/ )
-* Django 1.10 or later
+* Django 2.2
 
 ## Installation:
 Working in your project's virtual environment:
@@ -63,7 +63,7 @@ The django-pinpayments app needs to create two tables in the database, so be sur
 
 **IMPORTANT**
 
-*templates/shop/checkout.html* has been overridden from the version in cartridge 0.12.0 to define some extra ids and names on form elements that are used by the javascript in the included pin_header.html template.
+*templates/shop/checkout.html* has been overridden from the version in cartridge 1.0.0a to define some extra ids and names on form elements that are used by the javascript in the included pin_header.html template.
 
 These are:
 
