@@ -49,7 +49,7 @@ class PinOrderForm(shop_forms.OrderForm):
     - Errors from Pin.js are set by the Javascript, and will be handled
       as django errors.
 
-    See https://pin.net.au/docs/guides/payment-forms
+    See https://pinpayments.com/developers/integration-guides/payment-forms
     """
     card_token = forms.CharField(label=_("Card Token"), required=False)
     pinjs_errors = forms.CharField(label=_("Pin.js Errors"), required=False)
