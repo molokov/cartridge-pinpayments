@@ -43,6 +43,7 @@ $(function() {$('.middle :input:visible:enabled:first').focus();});
                 {% if not CHECKOUT_STEP_FIRST %}
                 <input type="submit" class="btn btn-lg btn-default pull-left" name="back" value="{% trans "Back" %}">
                 {% endif %}
+                {% block extra-nav-buttons %}{% endblock %}
             </div>
         {% else %}
             <p>{% trans "Your cart is empty." %}</p>
